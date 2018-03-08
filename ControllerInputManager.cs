@@ -1,4 +1,5 @@
 /* Controller Input Manager
+ 0. set up observer pattern on script
  1. add teleportation
  2. add object grabbing/throwing
  	- 
@@ -51,6 +52,8 @@ public class ControllerInputManager : MonoBehaviour {
 	SteamVR_TrackedObject[] trackedObjs; // 0 is left, 1 is right
 
 	// teleporting
+	GameObject arc;
+	ArcRenderer arcRenderer;
 	public GameObject teleportAimObject;
 	private LayerMask teleMask;
 	private Vector3 teleportLocation;
@@ -65,15 +68,17 @@ public class ControllerInputManager : MonoBehaviour {
 	// private bool hasSwipedLeft;
 	// private bool hasSwipedRight;
 
-	void Awake () {
+	void Start () {
 		canvas = transform.GetChild(1).GetChild(1).gameObject;
+		arc = transform.GetChild(0).GetChild(1).gameObject;
+		arcRenderer = arc.GetComponent<ArcRenderer>();
 		controllerObjs = new GameObject[2];
 		trackedObjs = new SteamVR_TrackedObject[2];
 
 		for(int i = 0; i < 2; i++){
 			controllerObjs[i] = transform.GetChild(i).gameObject;
 			trackedObjs[i] = controllerObjs[i].GetComponent<SteamVR_TrackedObject>();
-		}
+		}	
 	}
 	
 	void Update () {
@@ -109,19 +114,31 @@ public class ControllerInputManager : MonoBehaviour {
 		// left hand functions
 		if(controllerObjs[0].activeSelf){
 			if(leftController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
-				Debug.Log("left touched!");
 
 			// teleport code
-			// if(rightController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
-				// set teleport aimer arc true;
+
+			if(leftController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
+				Debug.Log("left touched!");
+
+				arc.gameObject.SetActive(true);
+
+
 				// teleportAimObject.SetActive(true);
+				// arc.SetPosition(0, controllerObjs[0].transform.position);
 
 				// RaycastHit hit;
 				// if(Physics.Raycast(transform.position, transform.forward, out hit, 15, teleMask)){
 					// 	teleportLocation = hit.point;
 					// 	teleportAimObject.transform.position = teleportLocation;
 				// }
-			// }
+			}
+
+			if(arc.gameObject.activeSelf)
+				arcRenderer.SetValues(controllerObjs[0].transform);
+
+			// if(leftController.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.gameObject.activeSelf)
+				// arc.gameObject.SetActive(false);
+
 		}
 
 	}
