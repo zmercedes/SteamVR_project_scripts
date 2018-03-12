@@ -113,15 +113,13 @@ public class ControllerInputManager : MonoBehaviour {
 
 		// left hand functions
 		if(controllerObjs[0].activeSelf){
-			if(leftController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
-
 			// teleport code
 
+			if(leftController.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+				arc.gameObject.SetActive(!arc.activeSelf);
+			
 			if(leftController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
 				Debug.Log("left touched!");
-
-				arc.gameObject.SetActive(true);
-
 
 				// teleportAimObject.SetActive(true);
 				// arc.SetPosition(0, controllerObjs[0].transform.position);
@@ -140,11 +138,6 @@ public class ControllerInputManager : MonoBehaviour {
 				// arc.gameObject.SetActive(false);
 
 		}
-	}
-
-	void LateUpdate(){
-		Vector3 currentRot = arc.transform.eulerAngles;
-		arc.transform.eulerAngles = new Vector3(currentRot.x, currentRot.y, 0f);
 	}
 
 	// sets appropriate controller references

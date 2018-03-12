@@ -7,18 +7,17 @@ public class ArcRenderer : MonoBehaviour {
 	Mesh mesh;
 	public float meshWidth;
 
-	public float velocity;
-	public int resolution = 12;
-	public float angle;
-	public Vector3 direction;
-	public Vector3 controllerAngles;
+	// parameters for curve
+	public float velocity = 20f;
+	public int resolution = 30;
+	public float angle = 45f;
 
 	float g;
 	float radianAngle;
 
 	void Awake(){
 		mesh = GetComponent<MeshFilter>().mesh;
-		g = Mathf.Abs(Physics.gravity.y);
+		g = Mathf.Abs(Physics.gravity.y);	
 	}
 
 	// void OnValidate(){
@@ -27,10 +26,15 @@ public class ArcRenderer : MonoBehaviour {
 	// }
 
 	public void SetValues(Transform info){
-		controllerAngles = info.rotation.eulerAngles;
-		direction = Vector3.Normalize(info.rotation.eulerAngles);
-		//print(direction);
-		angle = Mathf.Abs(info.eulerAngles.x);
+		// print(info.rotation.x);
+		if(info.rotation.x < -0.25f)
+			angle = 0.2f;
+		else{
+			// print(info.rotation.x);
+			angle = 45f;
+		}
+
+
 		RenderArc(CalculateArcArray());
 	}
 
@@ -60,6 +64,7 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
+		mesh.RecalculateBounds();
 	}
 	
 	// calculates points for arc
