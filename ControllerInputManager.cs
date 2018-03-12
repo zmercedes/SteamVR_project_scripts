@@ -140,7 +140,11 @@ public class ControllerInputManager : MonoBehaviour {
 				// arc.gameObject.SetActive(false);
 
 		}
+	}
 
+	void LateUpdate(){
+		Vector3 currentRot = arc.transform.eulerAngles;
+		arc.transform.eulerAngles = new Vector3(currentRot.x, currentRot.y, 0f);
 	}
 
 	// sets appropriate controller references

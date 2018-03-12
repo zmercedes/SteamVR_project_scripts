@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +10,8 @@ public class ArcRenderer : MonoBehaviour {
 	public float velocity;
 	public int resolution = 12;
 	public float angle;
+	public Vector3 direction;
+	public Vector3 controllerAngles;
 
 	float g;
 	float radianAngle;
@@ -24,12 +26,11 @@ public class ArcRenderer : MonoBehaviour {
 	// 		RenderArc(CalculateArcArray());
 	// }
 
-	void Start () {
-		RenderArc(CalculateArcArray());
-	}
-
 	public void SetValues(Transform info){
-		angle = Mathf.Clamp(Mathf.Abs(info.eulerAngles.x), 40f, 90f);
+		controllerAngles = info.rotation.eulerAngles;
+		direction = Vector3.Normalize(info.rotation.eulerAngles);
+		//print(direction);
+		angle = Mathf.Abs(info.eulerAngles.x);
 		RenderArc(CalculateArcArray());
 	}
 
@@ -50,7 +51,7 @@ public class ArcRenderer : MonoBehaviour {
 				triangles[i*12 +2] = triangles[i*12 +3] = (i+1) *2;
 				triangles[i*12 +5] = (i+1) *2 +1;
 
-				triangles[i*12 + 6] = i*2;
+				triangles[i*12 +6] = i*2;
 				triangles[i*12 +7] = triangles[i*12 +10] = (i+1) *2;
 				triangles[i*12 +8] = triangles[i*12 +9] = i*2 +1;
 				triangles[i*12 +11] = (i+1) *2 +1;
@@ -63,7 +64,7 @@ public class ArcRenderer : MonoBehaviour {
 	
 	// calculates points for arc
 	Vector3[] CalculateArcArray(){
-		Vector3[] arcArray = new Vector3[resolution + 1];
+		Vector3[] arcArray = new Vector3[resolution +1];
 
 		radianAngle = Mathf.Deg2Rad * angle;
 		float maxDist = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / g;
