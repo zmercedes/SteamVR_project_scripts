@@ -6,6 +6,10 @@ public class ArcRenderer : MonoBehaviour {
 
 	Mesh mesh;
 	public float meshWidth;
+	private MeshCollider meshCollider;
+
+	// shows teleport point
+	public GameObject aimerObject;
 
 	// parameters for curve
 	public float velocity = 20f;
@@ -17,7 +21,8 @@ public class ArcRenderer : MonoBehaviour {
 
 	void Awake(){
 		mesh = GetComponent<MeshFilter>().mesh;
-		g = Mathf.Abs(Physics.gravity.y);	
+		g = Mathf.Abs(Physics.gravity.y);
+		meshCollider = GetComponent<MeshCollider>();
 	}
 
 	// void OnValidate(){
@@ -25,16 +30,7 @@ public class ArcRenderer : MonoBehaviour {
 	// 		RenderArc(CalculateArcArray());
 	// }
 
-	public void SetValues(Transform info){
-		// print(info.rotation.x);
-		if(info.rotation.x < -0.25f)
-			angle = 0.2f;
-		else{
-			// print(info.rotation.x);
-			angle = 45f;
-		}
-
-
+	void Update(){
 		RenderArc(CalculateArcArray());
 	}
 
@@ -64,7 +60,8 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
-		mesh.RecalculateBounds();
+		meshCollider.sharedMesh = mesh;
+		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 	}
 	
 	// calculates points for arc
@@ -80,6 +77,14 @@ public class ArcRenderer : MonoBehaviour {
 		}
 
 		return arcArray;
+	}
+
+	void OnCollisionEnter(Collision other){
+
+		// print("colliding with thing");
+		aimerObject.SetActive(other.gameObject.tag == "teleport");
+		Vector3 contact = other.contacts[0].point;
+		aimerObject.transform.position = new Vector3(contact.x,0f,contact.z);
 	}
 
 	// calculates individual points in the arc using 

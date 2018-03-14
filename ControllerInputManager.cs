@@ -113,11 +113,20 @@ public class ControllerInputManager : MonoBehaviour {
 
 		// left hand functions
 		if(controllerObjs[0].activeSelf){
-			// teleport code
 
-			if(leftController.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
-				arc.gameObject.SetActive(!arc.activeSelf);
-			
+			if(leftController.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !arc.activeSelf)
+				arc.SetActive(true);
+
+			// teleport code
+			if(leftController.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
+				if(arcRenderer.aimerObject.activeSelf){
+					transform.position = arcRenderer.aimerObject.transform.position;
+					print("teleported to " + transform.position);
+				}
+				arcRenderer.aimerObject.SetActive(false);
+				arc.SetActive(false);
+			}
+
 			if(leftController.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
 				Debug.Log("left touched!");
 
@@ -131,8 +140,8 @@ public class ControllerInputManager : MonoBehaviour {
 				// }
 			}
 
-			if(arc.gameObject.activeSelf)
-				arcRenderer.SetValues(controllerObjs[0].transform);
+			// if(arc.gameObject.activeSelf)
+			// 	arcRenderer.SetValues(controllerObjs[0].transform);
 
 			// if(leftController.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.gameObject.activeSelf)
 				// arc.gameObject.SetActive(false);
