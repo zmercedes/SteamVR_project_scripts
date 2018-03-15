@@ -80,11 +80,13 @@ public class ArcRenderer : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision other){
-
-		// print("colliding with thing");
-		aimerObject.SetActive(other.gameObject.tag == "teleport");
-		Vector3 contact = other.contacts[0].point;
-		aimerObject.transform.position = new Vector3(contact.x,0f,contact.z);
+		if(other.gameObject.tag == "teleport"){
+			aimerObject.SetActive(true);
+			Vector3 contact = other.contacts[other.contacts.Length -1].point;
+			Vector3 startPos = aimerObject.transform.position;
+			Vector3 endPos = new Vector3(contact.x,0f,contact.z);
+			aimerObject.transform.position = Vector3.Lerp(startPos, endPos, 0.75f);
+		}
 	}
 
 	// calculates individual points in the arc using 
