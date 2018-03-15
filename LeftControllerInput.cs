@@ -1,6 +1,6 @@
 /* Controller Input Manager
- 0. set up observer pattern on script
- 1. add teleportation
+ 0. set up observer pattern on script -> scrapped
+ 1. add teleportation 				  -> done
  2. add object grabbing/throwing
  	- 
  3. create rube goldberg objects
@@ -45,6 +45,10 @@ public class LeftControllerInput : MonoBehaviour {
 	SteamVR_Controller.Device controller;
 	SteamVR_TrackedObject trackedObj;
 
+	// reference to right controller
+	GameObject rightController;
+	bool isGrabbing = false;
+
 	// teleporting
 	GameObject arc;
 	ArcRenderer arcRenderer;
@@ -54,6 +58,7 @@ public class LeftControllerInput : MonoBehaviour {
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
+		rightController = transform.parent.GetChild(1).gameObject;
 		arc = transform.GetChild(1).gameObject;
 		arcRenderer = arc.GetComponent<ArcRenderer>();
 		player = transform.parent.gameObject;
@@ -82,14 +87,28 @@ public class LeftControllerInput : MonoBehaviour {
 
 	}
 
-	// void OnTriggerStay(Collider col){
-	// 	if(col.gameObject.CompareTag("Throwable")){
-	// 		if(device.GetPressUp(SteamVR_Controller.ButtonMask.Grip)){ 
-	// 			ThrowObject(col);
-	// 		} else if(device.GetPressDown(SteamVR_Controller.ButtonMask.Grip)){
-	// 			GrabObject(col);
-	// 		}
-	// 	}
-	// }
+	void OnTriggerStay(Collider col){
+		if(col.gameObject.CompareTag("Throwable")){
+			if(controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip)){ 
+				isGrabbing = false;
+				// ThrowObject(col);
+			} else if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip)){
+				isGrabbing = true;
+				// GrabObject(col);
+			}
+		}
+	}
+
+	void ThrowObject(){
+
+	}
+
+	void GrabObject(){
+
+	}
+
+	void PlaceObject(){
+
+	}
 
 }
