@@ -1,5 +1,6 @@
 /* Controller Input Manager
  0. set up observer pattern on script -> scrapped
+ 0. set up hand control scripts       -> done
  1. add teleportation 				  -> done
  2. add object grabbing/throwing
  	- 
@@ -45,10 +46,6 @@ public class LeftControllerInput : MonoBehaviour {
 	SteamVR_Controller.Device controller;
 	SteamVR_TrackedObject trackedObj;
 
-	// reference to right controller
-	GameObject rightController;
-	bool isGrabbing = false;
-
 	// teleporting
 	GameObject arc;
 	ArcRenderer arcRenderer;
@@ -58,7 +55,6 @@ public class LeftControllerInput : MonoBehaviour {
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
-		rightController = transform.parent.GetChild(1).gameObject;
 		arc = transform.GetChild(1).gameObject;
 		arcRenderer = arc.GetComponent<ArcRenderer>();
 		player = transform.parent.gameObject;
@@ -73,42 +69,46 @@ public class LeftControllerInput : MonoBehaviour {
 			arc.SetActive(true);
 
 		// teleport code
-		if(controller.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
-			if(arcRenderer.aimerObject.activeSelf){
-				player.transform.position = arcRenderer.aimerObject.transform.position;
-				print("teleported to " + transform.position);
-			}
-			arcRenderer.aimerObject.SetActive(false);
-			arc.SetActive(false);
-		}
+		// if(controller.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
+		// 	if(arcRenderer.aimerObject.activeSelf){
+		// 		player.transform.position = arcRenderer.aimerObject.transform.position;
+		// 		print("teleported to " + transform.position);
+		// 	}
+		// 	arcRenderer.aimerObject.SetActive(false);
+		// 	arc.SetActive(false);
+		// }
 
 		if(controller.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
 			Debug.Log("left touched!");
 
 	}
 
+	public float throwForce = 1.5f;
+
 	void OnTriggerStay(Collider col){
 		if(col.gameObject.CompareTag("Throwable")){
 			if(controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip)){ 
-				isGrabbing = false;
 				// ThrowObject(col);
 			} else if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip)){
-				isGrabbing = true;
 				// GrabObject(col);
 			}
 		}
 	}
 
-	void ThrowObject(){
-
+	void GrabObject(Collider coll){
+		coll.transform.SetParent(gameObject.transform);     // make controller parent
+		coll.GetComponent<Rigidbody>().isKinematic = true;  // turn off physics
+		controller.TriggerHapticPulse(2000);				// vibrate controller
+		Debug.Log("Grabbing object!");
 	}
 
-	void GrabObject(){
-
-	}
-
-	void PlaceObject(){
-
+	void ThrowObject(Collider coll){
+		coll.transform.SetParent(null);
+		Rigidbody rigidBody = coll.GetComponent<Rigidbody>();
+		rigidBody.isKinematic = false;
+		rigidBody.velocity = controller.velocity * throwForce;
+		rigidBody.angularVelocity = controller.angularVelocity;
+		Debug.Log("Released object!");
 	}
 
 }

@@ -1,5 +1,6 @@
 /* Controller Input Manager
  0. set up observer pattern on script -> scrapped
+ 0. set up hand control scripts       -> done
  1. add teleportation 				  -> done
  2. add object grabbing/throwing
  	- 
@@ -45,10 +46,6 @@ public class RightControllerInput : MonoBehaviour {
 	SteamVR_Controller.Device controller;
 	SteamVR_TrackedObject trackedObj;
 
-	// reference to left controller
-	GameObject leftController;
-	bool isGrabbing = false;
-
 	// testing pane with touchpad
 	GameObject canvas;
 	private float touchLast;
@@ -60,7 +57,6 @@ public class RightControllerInput : MonoBehaviour {
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
-		leftController = transform.parent.GetChild(0).gameObject;
 		canvas = transform.GetChild(1).gameObject;
 	}
 
@@ -93,27 +89,43 @@ public class RightControllerInput : MonoBehaviour {
 			}
 	}
 
+	public float throwForce = 1.5f;
+
 	void OnTriggerStay(Collider col){
-		if(col.gameObject.CompareTag("Throwable")){
-			if(device.GetPressUp(SteamVR_Controller.ButtonMask.Grip)){ 
-				isGrabbing = false;
-	// 			ThrowObject(col);
-			} else if(device.GetPressDown(SteamVR_Controller.ButtonMask.Grip)){
-				isGrabbing = true;
-	// 			GrabObject(col);
-			}
+		if(col.gameObject.CompareTag("grabable")){
+			if(controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip))
+				ThrowObject(col);
+			else if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
+				GrabObject(col);
+			
 		}
 	}
 
-	void ThrowObject(){
-
+	void GrabObject(Collider coll){
+		coll.transform.SetParent(gameObject.transform);     // make controller parent
+		coll.GetComponent<Rigidbody>().isKinematic = true;  // turn off physics
+		controller.TriggerHapticPulse(2000);				// vibrate controller
+		Debug.Log("Grabbing object!");
 	}
 
-	void GrabObject(){
-
+	void ThrowObject(Collider coll){
+		coll.transform.SetParent(null);
+		Rigidbody rigidBody = coll.GetComponent<Rigidbody>();
+		rigidBody.isKinematic = false;
+		rigidBody.velocity = controller.velocity * throwForce;
+		rigidBody.angularVelocity = controller.angularVelocity;
+		Debug.Log("Released object!");
 	}
 
-	void PlaceObject(){
+	// void ThrowObject(){
 
-	}
+	// }
+
+	// void GrabObject(){
+
+	// }
+
+	// void PlaceObject(){
+
+	// }
 }
