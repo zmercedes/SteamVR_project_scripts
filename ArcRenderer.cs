@@ -12,12 +12,10 @@ public class ArcRenderer : MonoBehaviour {
 	public GameObject aimerObject;
 
 	// rework stuff
-	public Transform hTarget;
-	public Transform target;
 	public Vector3 velocity;
 	public int resolution = 30;
-	public float time;
-	public float height;
+	public float time = 5f;
+	public float speed = 10f;
 	public float g = -18f;
 
 	void Awake(){
@@ -33,54 +31,45 @@ public class ArcRenderer : MonoBehaviour {
 	// }
 
 	void Update(){
-		if(transform.parent.parent.eulerAngles.x < 315 && transform.parent.parent.eulerAngles.x > 90)
+		if(transform.parent.eulerAngles.x < 315 && transform.parent.eulerAngles.x > 90)
 			aimerObject.SetActive(false);
 
-		CalculateLaunchData();
+		velocity = transform.parent.forward * speed;
+
 		DrawPath();
 
 		// RenderArc(CalculateArcArray());
 	}
 
-	// void RenderArc(Vector3[] arcVerts){
-	// 	mesh.Clear();
-	// 	Vector3[] vertices = new Vector3[(resolution + 1) * 2];
-	// 	int[] triangles = new int[resolution * 6 * 2];
+	void RenderArc(Vector3[] arcVerts){
+		mesh.Clear();
+		Vector3[] vertices = new Vector3[(resolution + 1) * 2];
+		int[] triangles = new int[resolution * 6 * 2];
 		
-	// 	for(int i = 0; i <= resolution; i++){
-	// 		// set vertices
-	// 		vertices[i*2] = new Vector3(meshWidth * 0.5f, arcVerts[i].y, arcVerts[i].x);
-	// 		vertices[i*2 +1] = new Vector3(meshWidth * -0.5f, arcVerts[i].y, arcVerts[i].x);
+		for(int i = 0; i <= resolution; i++){
+			// set vertices
+			vertices[i*2] = new Vector3(meshWidth * 0.5f, arcVerts[i].y, arcVerts[i].x);
+			vertices[i*2 +1] = new Vector3(meshWidth * -0.5f, arcVerts[i].y, arcVerts[i].x);
 		
-	// 		// set triangles
-	// 		if(i != resolution){
-	// 			triangles[i*12] = i*2;
-	// 			triangles[i*12 +1] = triangles[i*12 +4] = i*2 +1;
-	// 			triangles[i*12 +2] = triangles[i*12 +3] = (i+1) *2;
-	// 			triangles[i*12 +5] = (i+1) *2 +1;
+			// set triangles
+			if(i != resolution){
+				triangles[i*12] = i*2;
+				triangles[i*12 +1] = triangles[i*12 +4] = i*2 +1;
+				triangles[i*12 +2] = triangles[i*12 +3] = (i+1) *2;
+				triangles[i*12 +5] = (i+1) *2 +1;
 
-	// 			triangles[i*12 +6] = i*2;
-	// 			triangles[i*12 +7] = triangles[i*12 +10] = (i+1) *2;
-	// 			triangles[i*12 +8] = triangles[i*12 +9] = i*2 +1;
-	// 			triangles[i*12 +11] = (i+1) *2 +1;
-	// 		}
+				triangles[i*12 +6] = i*2;
+				triangles[i*12 +7] = triangles[i*12 +10] = (i+1) *2;
+				triangles[i*12 +8] = triangles[i*12 +9] = i*2 +1;
+				triangles[i*12 +11] = (i+1) *2 +1;
+			}
 
-	// 		mesh.vertices = vertices;
-	// 		mesh.triangles = triangles;
-	// 	}
-	// 	meshCollider.sharedMesh = mesh;
-	// 	mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
+			mesh.vertices = vertices;
+			mesh.triangles = triangles;
+		}
+		meshCollider.sharedMesh = mesh;
+		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 
-	// }
-
-	void CalculateLaunchData() {
-		float h = hTarget.up + height;
-		float displacementY = target.position.y - transform.position.y;
-		Vector3 displacementXZ = new Vector3 (target.position.x - transform.position.x, 0, target.position.z - transform.position.z);
-		time = Mathf.Sqrt(-2*h/g) + Mathf.Sqrt(2*(displacementY - h)/g);
-		Vector3 velocityY = transform.up * Mathf.Sqrt (-2 * g * h);
-		Vector3 velocityXZ = displacementXZ / time;
-		velocity = velocityXZ + velocityY * -Mathf.Sign(g);
 	}
 	
 	// calculates points for arc
@@ -103,7 +92,6 @@ public class ArcRenderer : MonoBehaviour {
 	void DrawPath() {
 		Vector3 previousDrawPoint = transform.position;
 
-		int resolution = 30;
 		for (int i = 1; i <= resolution; i++) {
 			float simulationTime = i / (float)resolution * time;
 			Vector3 displacement = velocity * simulationTime + transform.up *g * simulationTime * simulationTime / 2f;
