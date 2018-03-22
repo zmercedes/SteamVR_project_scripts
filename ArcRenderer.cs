@@ -17,9 +17,9 @@ public class ArcRenderer : MonoBehaviour {
 	public float time = 5f;
 	public float speed = 10f;
 	public float g = -18f;
+	public bool debugPath = false;
 
 	void Awake(){
-		Physics.gravity = Vector3.up * g;
 		mesh = GetComponent<MeshFilter>().mesh;
 		meshCollider = GetComponent<MeshCollider>();
 		// RenderArc(CalculateArcArray());
@@ -36,9 +36,7 @@ public class ArcRenderer : MonoBehaviour {
 
 		velocity = transform.parent.forward * speed;
 
-		DrawPath();
-
-		// RenderArc(CalculateArcArray());
+		RenderArc(DrawPath());
 	}
 
 	void RenderArc(Vector3[] arcVerts){
@@ -67,39 +65,46 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
+		// print("arc vert: " + arcVerts[0].ToString() + "\n vertex: " + vertices[0].ToString() + "\n triangle: " + triangles[0]);
 		meshCollider.sharedMesh = mesh;
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 
 	}
 	
 	// calculates points for arc
-	Vector3[] CalculateArcArray(){
+	// Vector3[] CalculateArcArray(){
+	// 	Vector3 previous = transform.position;
+
+	// 	// float maxDist = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / g;
+
+	// 	for(int i = 1; i <= resolution; i++){
+	// 		float t = i / (float)resolution * time;
+	// 		Vector3 displacement = velocity * t + Vector3.up * g * time * time / 2f;
+	// 		//arcArray[i] = transform.position + displacement;
+	// 		previous = arcArray[i];
+	// 	}
+
+	// 	return arcArray;
+	// }
+
+	Vector3[] DrawPath() {
 		Vector3[] arcArray = new Vector3[resolution +1];
-		Vector3 previous = transform.position;
+		Vector3 previousDrawPoint = transform.position;
+		// print("Origin: " + previousDrawPoint.ToString());
 
-		// float maxDist = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / g;
+		for (int i = 0; i <= resolution; i++) {
+			float simulationTime = i / (float)resolution * time;
+			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
+			Vector3 drawPoint = transform.parent.position + displacement;
+			if(debugPath)
+				Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
 
-		for(int i = 1; i <= resolution; i++){
-			float t = i / (float)resolution * time;
-			Vector3 displacement = velocity * t + Vector3.up * g * time * time / 2f;
-			//arcArray[i] = transform.position + displacement;
-			previous = arcArray[i];
+			arcArray[i] = displacement;
+			previousDrawPoint = drawPoint;
 		}
-
 		return arcArray;
 	}
 
-	void DrawPath() {
-		Vector3 previousDrawPoint = transform.position;
-
-		for (int i = 1; i <= resolution; i++) {
-			float simulationTime = i / (float)resolution * time;
-			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
-			Vector3 drawPoint = transform.position + displacement;
-			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
-			previousDrawPoint = drawPoint;
-		}
-	}
 
 	// calculates individual points in the arc using 
 	// 
