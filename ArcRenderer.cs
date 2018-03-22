@@ -19,7 +19,7 @@ public class ArcRenderer : MonoBehaviour {
 	public float g = -18f;
 
 	void Awake(){
-		Physics.gravity = transform.up * g;
+		Physics.gravity = Vector3.up * g;
 		mesh = GetComponent<MeshFilter>().mesh;
 		meshCollider = GetComponent<MeshCollider>();
 		// RenderArc(CalculateArcArray());
@@ -81,7 +81,7 @@ public class ArcRenderer : MonoBehaviour {
 
 		for(int i = 1; i <= resolution; i++){
 			float t = i / (float)resolution * time;
-			Vector3 displacement = velocity * t + transform.up * g * time * time / 2f;
+			Vector3 displacement = velocity * t + Vector3.up * g * time * time / 2f;
 			//arcArray[i] = transform.position + displacement;
 			previous = arcArray[i];
 		}
@@ -94,7 +94,7 @@ public class ArcRenderer : MonoBehaviour {
 
 		for (int i = 1; i <= resolution; i++) {
 			float simulationTime = i / (float)resolution * time;
-			Vector3 displacement = velocity * simulationTime + transform.up *g * simulationTime * simulationTime / 2f;
+			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = transform.position + displacement;
 			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
 			previousDrawPoint = drawPoint;
