@@ -18,6 +18,8 @@ public class ArcRenderer : MonoBehaviour {
 	public float speed = 10f;
 	public float g = -18f;
 	public bool debugPath = false;
+	public bool textDebug = false;
+	public string textLocation = @"C:\Users\Zoilo\Desktop\rube goldberg VR\High-Immersion-Starter-Project-master\arcdebug2.txt";
 
 	void Awake(){
 		mesh = GetComponent<MeshFilter>().mesh;
@@ -35,6 +37,12 @@ public class ArcRenderer : MonoBehaviour {
 			aimerObject.SetActive(false);
 
 		velocity = transform.parent.forward * speed;
+		if(textDebug){
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true))
+	        {
+	            file.WriteLine("transform.parent.forward: " + transform.parent.forward.ToString());
+	        }
+	    }
 
 		RenderArc(DrawPath());
 	}
@@ -65,10 +73,9 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
-		// print("arc vert: " + arcVerts[0].ToString() + "\n vertex: " + vertices[0].ToString() + "\n triangle: " + triangles[0]);
+		// print("arc vert: " + arcVerts[arcVerts.Length / 2].ToString() + "\n vertex: " + vertices[vertices.Length / 2].ToString() + "\n triangle: " + triangles[triangles.Length / 2]);
 		meshCollider.sharedMesh = mesh;
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
-
 	}
 	
 	// calculates points for arc
@@ -95,11 +102,19 @@ public class ArcRenderer : MonoBehaviour {
 		for (int i = 0; i <= resolution; i++) {
 			float simulationTime = i / (float)resolution * time;
 			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
-			Vector3 drawPoint = transform.parent.position + displacement;
-			if(debugPath)
+			Vector3 drawPoint = transform.position + displacement;
+			if(debugPath){
 				Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
+				if(textDebug){
+					using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true))
+			        {
+			            file.WriteLine(" point: " + previousDrawPoint.ToString() +
+			            			   "\n displacement: " + displacement.ToString());
+			        }
+				}
+			}
 
-			arcArray[i] = displacement;
+			arcArray[i] = displacement; // issue with calculation: need to fix point of origin
 			previousDrawPoint = drawPoint;
 		}
 		return arcArray;

@@ -69,14 +69,14 @@ public class LeftControllerInput : MonoBehaviour {
 			arc.SetActive(true);
 
 		// teleport code
-		// if(controller.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
-		// 	if(arcRenderer.aimerObject.activeSelf){
-		// 		player.transform.position = arcRenderer.aimerObject.transform.position;
-		// 		print("teleported to " + transform.position);
-		// 	}
-		// 	arcRenderer.aimerObject.SetActive(false);
-		// 	arc.SetActive(false);
-		// }
+		if(controller.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
+			// if(arcRenderer.aimerObject.activeSelf){
+			// 	player.transform.position = arcRenderer.aimerObject.transform.position;
+			// 	print("teleported to " + transform.position);
+			// }
+			arcRenderer.aimerObject.SetActive(false);
+			arc.SetActive(false);
+		}
 
 		if(controller.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
 			Debug.Log("left touched!");
