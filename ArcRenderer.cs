@@ -5,6 +5,7 @@ using UnityEngine;
 public class ArcRenderer : MonoBehaviour {
 
 	Mesh mesh;
+	public Transform controller;
 	public float meshWidth;
 	private MeshCollider meshCollider;
 
@@ -20,29 +21,33 @@ public class ArcRenderer : MonoBehaviour {
 	public bool debugPath = false;
 	public bool textDebug = false;
 	public string textLocation = @"C:\Users\Zoilo\Desktop\rube goldberg VR\High-Immersion-Starter-Project-master\arcdebug2.txt";
+	float lastRotation;
 
 	void Awake(){
 		mesh = GetComponent<MeshFilter>().mesh;
 		meshCollider = GetComponent<MeshCollider>();
-		// RenderArc(CalculateArcArray());
+		lastRotation = controller.eulerAngles.y;
+		transform.Rotate(new Vector3(0f,controller.eulerAngles.y + 90f,0f));
 	}
 
-	// void OnValidate(){
-	// 	if(mesh != null && Application.isPlaying)
-	// 		RenderArc(CalculateArcArray());
-	// }
-
 	void Update(){
-		if(transform.parent.eulerAngles.x < 315 && transform.parent.eulerAngles.x > 90)
+		transform.position = controller.position;
+		if(controller.eulerAngles.y != lastRotation){
+			transform.Rotate(new Vector3(0f, controller.eulerAngles.y - lastRotation,0f));
+			lastRotation = controller.eulerAngles.y;
+		}
+
+		if(controller.eulerAngles.x < 315 && controller.eulerAngles.x > 90)
 			aimerObject.SetActive(false);
 
-		velocity = transform.parent.forward * speed;
-		if(textDebug){
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true))
-	        {
-	            file.WriteLine("transform.parent.forward: " + transform.parent.forward.ToString());
-	        }
-	    }
+		velocity = controller.forward * speed;
+
+		// if(textDebug){
+		// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
+		// 		file.WriteLine("transform.position: " + transform.position.ToString() +
+		// 					   "\ntransform.forward: " + transform.forward.ToString());
+		// 	}
+		// }
 
 		RenderArc(DrawPath());
 	}
@@ -54,8 +59,8 @@ public class ArcRenderer : MonoBehaviour {
 		
 		for(int i = 0; i <= resolution; i++){
 			// set vertices
-			vertices[i*2] = new Vector3(meshWidth * 0.5f, arcVerts[i].y, arcVerts[i].x);
-			vertices[i*2 +1] = new Vector3(meshWidth * -0.5f, arcVerts[i].y, arcVerts[i].x);
+			vertices[i*2] = new Vector3(arcVerts[i].x, arcVerts[i].y, meshWidth * 0.5f);
+			vertices[i*2 +1] = new Vector3(arcVerts[i].x, arcVerts[i].y, -meshWidth * 0.5f);
 		
 			// set triangles
 			if(i != resolution){
@@ -69,72 +74,50 @@ public class ArcRenderer : MonoBehaviour {
 				triangles[i*12 +8] = triangles[i*12 +9] = i*2 +1;
 				triangles[i*12 +11] = (i+1) *2 +1;
 			}
+			
 
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
-		// print("arc vert: " + arcVerts[arcVerts.Length / 2].ToString() + "\n vertex: " + vertices[vertices.Length / 2].ToString() + "\n triangle: " + triangles[triangles.Length / 2]);
+		// if(textDebug){
+		// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
+		// 		for(int i = 0; i < vertices.Length; i++)
+		// 			file.WriteLine(" vertex " + i + ": " + vertices[i].ToString());
+		// 	}
+		// }
+
 		meshCollider.sharedMesh = mesh;
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 	}
-	
-	// calculates points for arc
-	// Vector3[] CalculateArcArray(){
-	// 	Vector3 previous = transform.position;
-
-	// 	// float maxDist = (velocity * velocity * Mathf.Sin(2 * radianAngle)) / g;
-
-	// 	for(int i = 1; i <= resolution; i++){
-	// 		float t = i / (float)resolution * time;
-	// 		Vector3 displacement = velocity * t + Vector3.up * g * time * time / 2f;
-	// 		//arcArray[i] = transform.position + displacement;
-	// 		previous = arcArray[i];
-	// 	}
-
-	// 	return arcArray;
-	// }
 
 	Vector3[] DrawPath() {
 		Vector3[] arcArray = new Vector3[resolution +1];
-		Vector3 previousDrawPoint = transform.position;
-		// print("Origin: " + previousDrawPoint.ToString());
+		Vector3 previousDrawPoint = controller.position;
 
-		for (int i = 0; i <= resolution; i++) {
+		for (int i = 1; i <= resolution; i++) {
 			float simulationTime = i / (float)resolution * time;
 			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
-			Vector3 drawPoint = transform.position + displacement;
+			Vector3 drawPoint = controller.position + displacement;
 			if(debugPath){
 				Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
-				if(textDebug){
-					using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true))
-			        {
-			            file.WriteLine(" point: " + previousDrawPoint.ToString() +
-			            			   "\n displacement: " + displacement.ToString());
-			        }
-				}
+				// if(textDebug){
+				// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
+				// 		file.WriteLine(" point " + i + ": " + previousDrawPoint.ToString());
+				// 	}
+				// }
 			}
-
-			arcArray[i] = displacement; // issue with calculation: need to fix point of origin
+			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points are annoying
 			previousDrawPoint = drawPoint;
 		}
 		return arcArray;
 	}
-
-
-	// calculates individual points in the arc using 
-	// 
-	// Vector3 CalculateArcPoint(float t, float maxDist){
-	// 	float x = t * maxDist;
-	//     float y = x * Mathf.Tan(radianAngle) - ((g * x * x) / (2 * velocity * velocity * Mathf.Cos(radianAngle) * Mathf.Cos(radianAngle)));
-	// 	return new Vector3(x,y);
-	// }
 
 	void OnCollisionEnter(Collision other){
 		if(other.gameObject.tag == "teleport"){
 			aimerObject.SetActive(true);
 			Vector3 contact = other.contacts[other.contacts.Length / 2].point;
 			Vector3 startPos = aimerObject.transform.position;
-			Vector3 endPos = new Vector3(contact.x,0.03f,contact.z);
+			Vector3 endPos = new Vector3(contact.x,0.02f,contact.z);
 			aimerObject.transform.position = Vector3.Lerp(startPos, endPos, 0.75f);
 		}
 	}

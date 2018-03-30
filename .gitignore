@@ -3,3 +3,6 @@
 
 # sublime tings
 *.sublime*
+
+# txt files
+*.txt

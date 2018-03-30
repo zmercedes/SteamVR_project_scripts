@@ -43,19 +43,19 @@ using System;
 public class LeftControllerInput : MonoBehaviour {
 
 	// controller references
-	SteamVR_Controller.Device controller;
-	SteamVR_TrackedObject trackedObj;
+	private SteamVR_Controller.Device controller;
+	private SteamVR_TrackedObject trackedObj;
 
 	// teleporting
-	GameObject arc;
-	ArcRenderer arcRenderer;
+	public GameObject arc;
+	private ArcRenderer arcRenderer;
 	private LayerMask teleMask;
 	private Vector3 teleportLocation;
 	private GameObject player;
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
-		arc = transform.GetChild(1).gameObject;
+		// arc = transform.GetChild(1).gameObject;
 		arcRenderer = arc.GetComponent<ArcRenderer>();
 		player = transform.parent.gameObject;
 	}
@@ -70,10 +70,10 @@ public class LeftControllerInput : MonoBehaviour {
 
 		// teleport code
 		if(controller.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad) && arc.activeSelf){
-			// if(arcRenderer.aimerObject.activeSelf){
-			// 	player.transform.position = arcRenderer.aimerObject.transform.position;
-			// 	print("teleported to " + transform.position);
-			// }
+			if(arcRenderer.aimerObject.activeSelf){
+				player.transform.position = arcRenderer.aimerObject.transform.position;
+				print("teleported to " + transform.position);
+			}
 			arcRenderer.aimerObject.SetActive(false);
 			arc.SetActive(false);
 		}
