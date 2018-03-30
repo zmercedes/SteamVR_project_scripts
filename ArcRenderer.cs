@@ -4,42 +4,57 @@ using UnityEngine;
 
 public class ArcRenderer : MonoBehaviour {
 
-	Mesh mesh;
-	public Transform controller;
+	// mesh components
 	public float meshWidth;
+	private Mesh mesh;
 	private MeshCollider meshCollider;
 
-	// shows teleport point
+	// controller reference
+	public Transform controller;
+	private float lastRotation;
+
+	// teleport aimer object
 	public GameObject aimerObject;
 
-	// rework stuff
-	public Vector3 velocity;
+	// arc information
 	public int resolution = 30;
 	public float time = 5f;
 	public float speed = 10f;
 	public float g = -18f;
+	private Vector3 velocity;
+
+	// debug stuff
 	public bool debugPath = false;
 	public bool textDebug = false;
 	public string textLocation = @"C:\Users\Zoilo\Desktop\rube goldberg VR\High-Immersion-Starter-Project-master\arcdebug2.txt";
-	float lastRotation;
 
 	void Awake(){
+		// set mesh components
 		mesh = GetComponent<MeshFilter>().mesh;
 		meshCollider = GetComponent<MeshCollider>();
+
+		// set initial y rotation of controller
 		lastRotation = controller.eulerAngles.y;
+
+		// sets appropriate rotation for arc
 		transform.Rotate(new Vector3(0f,controller.eulerAngles.y + 90f,0f));
 	}
 
 	void Update(){
+		// set point of origin to controller
 		transform.position = controller.position;
+
+		// applying y rotation
 		if(controller.eulerAngles.y != lastRotation){
 			transform.Rotate(new Vector3(0f, controller.eulerAngles.y - lastRotation,0f));
 			lastRotation = controller.eulerAngles.y;
 		}
 
+		// disable aimer object and arc when tilting above 45 degrees and below -90 degrees
 		if(controller.eulerAngles.x < 315 && controller.eulerAngles.x > 90)
 			aimerObject.SetActive(false);
 
+		// set velocity to shoot forward from controller
 		velocity = controller.forward * speed;
 
 		// if(textDebug){
@@ -49,7 +64,7 @@ public class ArcRenderer : MonoBehaviour {
 		// 	}
 		// }
 
-		RenderArc(DrawPath());
+		RenderArc(ArcArray());
 	}
 
 	void RenderArc(Vector3[] arcVerts){
@@ -75,7 +90,6 @@ public class ArcRenderer : MonoBehaviour {
 				triangles[i*12 +11] = (i+1) *2 +1;
 			}
 			
-
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
@@ -90,13 +104,13 @@ public class ArcRenderer : MonoBehaviour {
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 	}
 
-	Vector3[] DrawPath() {
+	Vector3[] ArcArray() {
 		Vector3[] arcArray = new Vector3[resolution +1];
 		Vector3 previousDrawPoint = controller.position;
 
 		for (int i = 1; i <= resolution; i++) {
 			float simulationTime = i / (float)resolution * time;
-			Vector3 displacement = velocity * simulationTime + Vector3.up *g * simulationTime * simulationTime / 2f;
+			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = controller.position + displacement;
 			if(debugPath){
 				Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
@@ -121,5 +135,4 @@ public class ArcRenderer : MonoBehaviour {
 			aimerObject.transform.position = Vector3.Lerp(startPos, endPos, 0.75f);
 		}
 	}
-
 }
