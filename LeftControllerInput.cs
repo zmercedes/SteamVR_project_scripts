@@ -35,8 +35,6 @@
      touchpad activates teleportation
      
  */
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -55,15 +53,12 @@ public class LeftControllerInput : MonoBehaviour {
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
-		// arc = transform.GetChild(1).gameObject;
 		arcRenderer = arc.GetComponent<ArcRenderer>();
 		player = transform.parent.gameObject;
 	}
 	
 	void Update () {
 		controller = SteamVR_Controller.Input((int)trackedObj.index);
-
-		// if(controller.GetPressDown)
 
 		if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !arc.activeSelf)
 			arc.SetActive(true);
@@ -110,5 +105,4 @@ public class LeftControllerInput : MonoBehaviour {
 		rigidBody.angularVelocity = controller.angularVelocity;
 		Debug.Log("Released object!");
 	}
-
 }
