@@ -69,13 +69,6 @@ public class ArcRenderer : MonoBehaviour {
 		// set velocity to shoot forward from controller
 		velocity = controller.forward * speed;
 
-		// if(textDebug){
-		// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
-		// 		file.WriteLine("transform.position: " + transform.position.ToString() +
-		// 					   "\ntransform.forward: " + transform.forward.ToString());
-		// 	}
-		// }
-
 		RenderArc(ArcArray());
 	}
 
@@ -105,12 +98,6 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 		}
-		// if(textDebug){
-		// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
-		// 		for(int i = 0; i < vertices.Length; i++)
-		// 			file.WriteLine(" vertex " + i + ": " + vertices[i].ToString());
-		// 	}
-		// }
 
 		meshCollider.sharedMesh = mesh;
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
@@ -124,15 +111,8 @@ public class ArcRenderer : MonoBehaviour {
 			float simulationTime = i / (float)resolution * time;
 			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = controller.position + displacement;
-			if(debugPath){
-				Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
-				// if(textDebug){
-				// 	using (System.IO.StreamWriter file = new System.IO.StreamWriter(textLocation, true)){
-				// 		file.WriteLine(" point " + i + ": " + previousDrawPoint.ToString());
-				// 	}
-				// }
-			}
-			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points are annoying
+
+			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points is annoying
 			previousDrawPoint = drawPoint;
 		}
 		return arcArray;
