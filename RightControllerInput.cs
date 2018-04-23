@@ -24,7 +24,6 @@
  	- make environment nice
  	- runs at 90fps
 
-
  Both Hand Actions:
      Grab objects
 

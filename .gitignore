@@ -2,7 +2,8 @@
 *.meta
 
 # sublime tings
-*.sublime*
+*.sublime-workspace
+*.sublime-project
 
 # txt files
 *.txt

@@ -3,7 +3,6 @@ using UnityEngine;
 public class ArcRenderer : MonoBehaviour {
 
 	// mesh components
-	public float meshWidth;
 	private Mesh mesh;
 	private MeshCollider meshCollider;
 
@@ -15,6 +14,7 @@ public class ArcRenderer : MonoBehaviour {
 	public GameObject aimerObject;
 
 	// arc information
+	public float meshWidth;
 	public int resolution = 30;
 	public float time = 5f;
 	public float speed = 10f;
