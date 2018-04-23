@@ -7,7 +7,7 @@ public class ArcRenderer : MonoBehaviour {
 	private MeshCollider meshCollider;
 
 	// controller reference
-	public Transform controller;
+	private Transform controller;
 	private float lastRotation;
 
 	// teleport aimer object
@@ -15,10 +15,12 @@ public class ArcRenderer : MonoBehaviour {
 
 	// arc information
 	public float meshWidth;
-	public int resolution = 30;
-	public float time = 5f;
+	public int resolution;
+	public float time;
 	public float speed = 10f;
 	public float g = -18f;
+	public Color[] colorIndicators;
+	private Material arcMat;
 	private Vector3 velocity;
 
 	// debug stuff
@@ -27,6 +29,12 @@ public class ArcRenderer : MonoBehaviour {
 	public string textLocation = @"C:\Users\Zoilo\Desktop\rube goldberg VR\High-Immersion-Starter-Project-master\arcdebug2.txt";
 
 	void Awake(){
+		// set controller reference
+		controller = transform.parent.GetChild(0);
+
+		// set material reference
+		arcMat = GetComponent<Renderer>().material;
+
 		// set mesh components
 		mesh = GetComponent<MeshFilter>().mesh;
 		meshCollider = GetComponent<MeshCollider>();
@@ -48,9 +56,15 @@ public class ArcRenderer : MonoBehaviour {
 			lastRotation = controller.eulerAngles.y;
 		}
 
-		// disable aimer object and arc when tilting above 45 degrees and below -90 degrees
-		if(controller.eulerAngles.x < 315 && controller.eulerAngles.x > 90)
+		// disable aimer object and arc when tilting above 45 degrees and below -90 degrees (max and min teleport distances)
+		if(controller.eulerAngles.x < 300 && controller.eulerAngles.x > 90){
+			arcMat.color = colorIndicators[1];
+			time = 0.01f;
 			aimerObject.SetActive(false);
+		} else {
+			arcMat.color = colorIndicators[0];
+			time = 2f;
+		}
 
 		// set velocity to shoot forward from controller
 		velocity = controller.forward * speed;
