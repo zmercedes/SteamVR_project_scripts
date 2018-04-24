@@ -1,3 +1,7 @@
+/* Zoilo Mercedes
+ * Arc renderer
+ * Activates on left touchpad press, renders an arc
+ */
 using UnityEngine;
 
 public class ArcRenderer : MonoBehaviour {
