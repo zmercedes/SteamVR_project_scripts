@@ -2,10 +2,10 @@ Rube Goldberg Challenge:
 
  0. [x] 0. set up hand control scripts
  1. [x] 1. add teleportation
- 2. [ ] 2. add object grabbing/throwing -> _added, needs polish_
+ 2. [ ] 2. add object grabbing/throwing -> _**added, needs polish**_
  3. [ ] 3. create rube goldberg objects
  	- try different geometries, colors, physics functions
- 4. [ ] 4. create object menu -> _added, needs polish_
+ 4. [ ] 4. create object menu -> _**added, needs polish**_
  	- attaches to right hand, appears on touchpad press
  5. [ ] 5. set special grab rules for rube goldberg objects
  	- can grab but cannot throw. on release, must stay in place
