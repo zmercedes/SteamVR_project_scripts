@@ -118,9 +118,13 @@ public class ArcRenderer : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision other){
+		if(other.gameObject.tag == "platform"){
+			aimerObject.SetActive(true);
+			aimerObject.transform.position = other.transform.position;;
+		}
 		if(other.gameObject.tag == "teleport"){
 			aimerObject.SetActive(true);
-			Vector3 contact = other.contacts[other.contacts.Length / 2].point;
+			Vector3 contact = other.contacts[0].point;
 			Vector3 startPos = aimerObject.transform.position;
 			Vector3 endPos = new Vector3(contact.x,0.02f,contact.z);
 			aimerObject.transform.position = Vector3.Lerp(startPos, endPos, 0.75f);
