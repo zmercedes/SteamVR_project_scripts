@@ -41,7 +41,6 @@ public class LeftControllerInput : MonoBehaviour {
 
 		if(controller.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
 			Debug.Log("left touched!");
-
 	}
 
 	public float throwForce = 1.5f;

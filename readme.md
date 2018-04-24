@@ -14,7 +14,8 @@ Rube Goldberg Challenge:
  	- reenable collectible on ball touching floor
  	- create goal that loads next level on ball hitting it after 
  	  having collected all collectibles
- 	- create anti cheating mechanics
+ 	- create anti cheating mechanics: the ball must be thrown from initial
+ 	  platform area in order to not trigger this mechanic
  	- 4 different levels
  	- can limit the number of objects that can be placed in a 
  	   level, can vary per level
