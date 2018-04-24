@@ -44,7 +44,7 @@ public class RightControllerInput : MonoBehaviour {
 	SteamVR_TrackedObject trackedObj;
 
 	// testing pane with touchpad
-	GameObject canvas;
+	GameObject objectMenu;
 	private float touchLast;
 	private float touchCurrent;
 	private float distance;
@@ -54,7 +54,7 @@ public class RightControllerInput : MonoBehaviour {
 
 	void Awake () {
 		trackedObj = GetComponent<SteamVR_TrackedObject>();
-		canvas = transform.GetChild(1).gameObject;
+		objectMenu = transform.GetChild(1).gameObject;
 	}
 
 	void Update () {
@@ -68,21 +68,21 @@ public class RightControllerInput : MonoBehaviour {
 			if(controller.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
 				touchLast = controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
 			
-			// activate/deactivate canvas on touchpad press
+			// activate/deactivate objectMenu on touchpad press
 			if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad)){
 				Debug.Log("right tp pressed down!");
-				canvas.SetActive(!canvas.activeSelf);
+				objectMenu.SetActive(!objectMenu.activeSelf);
 			}
 
-			// if canvas is active and player is touching touchpad,
-			// rotate the canvas based on swiping left/right on touchpad.
-			if(canvas.activeSelf && controller.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
+			// if objectMenu is active and player is touching touchpad,
+			// rotate the objectMenu based on swiping left/right on touchpad.
+			if(objectMenu.activeSelf && controller.GetTouch(SteamVR_Controller.ButtonMask.Touchpad)){
 
 				touchCurrent = controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
 				distance = touchCurrent - touchLast;
 				touchLast = touchCurrent;
 
-				canvas.transform.Rotate(Vector3.forward * distance * swipeSpeed);
+				objectMenu.transform.Rotate(Vector3.forward * distance * swipeSpeed);
 			}
 	}
 
@@ -94,7 +94,6 @@ public class RightControllerInput : MonoBehaviour {
 				ThrowObject(col);
 			else if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
 				GrabObject(col);
-			
 		}
 	}
 

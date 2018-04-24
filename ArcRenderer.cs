@@ -23,11 +23,6 @@ public class ArcRenderer : MonoBehaviour {
 	private Material arcMat;
 	private Vector3 velocity;
 
-	// debug stuff
-	public bool debugPath = false;
-	public bool textDebug = false;
-	public string textLocation = @"C:\Users\Zoilo\Desktop\rube goldberg VR\High-Immersion-Starter-Project-master\arcdebug2.txt";
-
 	void Awake(){
 		// set controller reference
 		controller = transform.parent.GetChild(0);
