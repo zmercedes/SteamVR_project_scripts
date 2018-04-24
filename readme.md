@@ -16,7 +16,7 @@ Rube Goldberg Challenge:
  	  having collected all collectibles
  	- create anti cheating mechanics
  	- 4 different levels
- 	-- can limit the number of objects that can be placed in a 
+ 	- can limit the number of objects that can be placed in a 
  	   level, can vary per level
  7. [ ] final polish!
  	- create instruction UI
