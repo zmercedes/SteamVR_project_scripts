@@ -2,6 +2,8 @@ Rube Goldberg Challenge:
 
  0. [x] 0. set up hand control scripts
  1. [x] 1. add teleportation
+ 	- reworked arc renderer serveral times, now uses parabolic raycaster to determine time to target,
+ 	  then renders an arc.
  2. [ ] 2. add object grabbing/throwing -> _**added, needs polish**_
  3. [ ] 3. create rube goldberg objects
  	- try different geometries, colors, physics functions
@@ -20,6 +22,7 @@ Rube Goldberg Challenge:
  	- can limit the number of objects that can be placed in a 
  	   level, can vary per level
  7. [ ] 7. final polish!
+ 	- rework the aimer object to show position above ground
  	- create instruction UI
  	- make environment nice
  	- runs at 90fps
