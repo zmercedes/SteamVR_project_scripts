@@ -15,7 +15,6 @@ public class ArcRenderer : MonoBehaviour {
 
 	// teleport aimer object
 	public GameObject aimerObject;
-	public GameObject detecter;
 
 	// arc information
 	public float meshWidth;
@@ -25,7 +24,6 @@ public class ArcRenderer : MonoBehaviour {
 	public float speed = 10f;
 	public float g = -18f;
 	public Color[] colorIndicators;
-	public float multiplier = 1.15f;
 	private Material arcMat;
 	private Vector3 velocity;
 
@@ -111,11 +109,12 @@ public class ArcRenderer : MonoBehaviour {
 			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = controller.position + displacement;
 
+			// raycast info
 			Vector3 difference = previousDrawPoint - drawPoint;
 			float length = difference.magnitude;
 			RaycastHit hit;
 			int mask = 1 << 8;
-
+			
 			if(Physics.Raycast(previousDrawPoint, difference.normalized, out hit, length, mask)){
 				aimerObject.SetActive(true);
 				timeToTarget = simulationTime + (1/(float)resolution*time)*(hit.distance/length);
@@ -126,6 +125,7 @@ public class ArcRenderer : MonoBehaviour {
 
 				break;
 			}
+
 			previousDrawPoint = drawPoint;
 		}
 
