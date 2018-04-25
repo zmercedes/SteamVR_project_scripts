@@ -8,7 +8,6 @@ public class ArcRenderer : MonoBehaviour {
 
 	// mesh components
 	private Mesh mesh;
-	private MeshCollider meshCollider;
 
 	// controller reference
 	private Transform controller;
@@ -39,7 +38,6 @@ public class ArcRenderer : MonoBehaviour {
 
 		// set mesh components
 		mesh = GetComponent<MeshFilter>().mesh;
-		meshCollider = GetComponent<MeshCollider>();
 
 		// set initial y rotation of controller
 		lastRotation = controller.eulerAngles.y;
@@ -101,7 +99,6 @@ public class ArcRenderer : MonoBehaviour {
 			mesh.triangles = triangles;
 		}
 
-		meshCollider.sharedMesh = mesh;
 		mesh.RecalculateBounds(); // must call this for mesh to be seen even when out of camera bounds
 	}
 
@@ -109,18 +106,27 @@ public class ArcRenderer : MonoBehaviour {
 		Vector3[] arcArray = new Vector3[resolution +1];
 		Vector3 previousDrawPoint = controller.position;
 
-		for (int i = 1; i <= resolution; i++) {
+		for (int i = 1; i <= resolution; i++) { // parabolic raycaster (neat!)
 			float simulationTime = i / (float)resolution * time;
 			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = controller.position + displacement;
 
-			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
-			previousDrawPoint = drawPoint;
+			Vector3 difference = previousDrawPoint - drawPoint;
+			float length = difference.magnitude;
+			RaycastHit hit;
+			int mask = 1 << 8;
 
-			if(aimerObject.activeSelf && transform.InverseTransformPoint(drawPoint).y <= aimerObject.transform.position.y && transform.InverseTransformPoint(drawPoint).y > aimerObject.transform.position.y -1f){
-				timeToTarget = ( i / (float)resolution * time ) * multiplier;
-				// break;
+			if(Physics.Raycast(previousDrawPoint, difference.normalized, out hit, length, mask)){
+				aimerObject.SetActive(true);
+				timeToTarget = simulationTime + (1/(float)resolution*time)*(hit.distance/length);
+				if(hit.collider.tag == "platform")
+					aimerObject.transform.position = hit.transform.position;
+				else
+					aimerObject.transform.position = hit.point;
+
+				break;
 			}
+			previousDrawPoint = drawPoint;
 		}
 
 		previousDrawPoint = controller.position;
@@ -131,28 +137,7 @@ public class ArcRenderer : MonoBehaviour {
 
 			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points is annoying
 			previousDrawPoint = drawPoint;
-			if(i == resolution){
-				int mask = 1 << 8;
-				RaycastHit hit;
-				if(Physics.Raycast(drawPoint, Vector3.down, out hit, 10f, mask))
-					aimerObject.transform.position = hit.point;
-			}
 		}
 		return arcArray;
-	}
-
-	void OnCollisionEnter(Collision other){
-		if(other.gameObject.tag == "platform"){
-			aimerObject.SetActive(true);
-			Vector3 platform = other.transform.position;
-			aimerObject.transform.position = new Vector3(platform.x, 0.44f, platform.z);
-		}
-		if(other.gameObject.tag == "teleport"){
-			aimerObject.SetActive(true);
-			Vector3 contact = other.contacts[0].point;
-			Vector3 startPos = aimerObject.transform.position;
-			Vector3 endPos = new Vector3(contact.x,0.02f,contact.z);
-			aimerObject.transform.position = Vector3.Lerp(startPos, endPos, 0.75f);
-		}
 	}
 }
