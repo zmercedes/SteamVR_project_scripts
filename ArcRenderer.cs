@@ -16,6 +16,7 @@ public class ArcRenderer : MonoBehaviour {
 
 	// teleport aimer object
 	public GameObject aimerObject;
+	public GameObject detecter;
 
 	// arc information
 	public float meshWidth;
@@ -115,7 +116,8 @@ public class ArcRenderer : MonoBehaviour {
 
 			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
 			previousDrawPoint = drawPoint;
-			if(transform.InverseTransformPoint(drawPoint).y <= aimerObject.transform.position.y){
+
+			if(aimerObject.activeSelf && transform.InverseTransformPoint(drawPoint).y <= aimerObject.transform.position.y && transform.InverseTransformPoint(drawPoint).y > aimerObject.transform.position.y -1f){
 				timeToTarget = ( i / (float)resolution * time ) * multiplier;
 				// break;
 			}
@@ -133,21 +135,20 @@ public class ArcRenderer : MonoBehaviour {
 				int mask = 1 << 8;
 				RaycastHit hit;
 				if(Physics.Raycast(drawPoint, Vector3.down, out hit, 10f, mask))
-					aimerObject.transform.position = hit.transform.position;
+					aimerObject.transform.position = hit.point;
 			}
-
 		}
 		return arcArray;
 	}
 
 	void OnCollisionEnter(Collision other){
-		aimerObject.SetActive(true);
-
 		if(other.gameObject.tag == "platform"){
+			aimerObject.SetActive(true);
 			Vector3 platform = other.transform.position;
 			aimerObject.transform.position = new Vector3(platform.x, 0.44f, platform.z);
 		}
 		if(other.gameObject.tag == "teleport"){
+			aimerObject.SetActive(true);
 			Vector3 contact = other.contacts[0].point;
 			Vector3 startPos = aimerObject.transform.position;
 			Vector3 endPos = new Vector3(contact.x,0.02f,contact.z);
