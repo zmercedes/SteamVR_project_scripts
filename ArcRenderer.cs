@@ -16,14 +16,17 @@ public class ArcRenderer : MonoBehaviour {
 
 	// teleport aimer object
 	public GameObject aimerObject;
+	public GameObject detecter;
 
 	// arc information
 	public float meshWidth;
 	public int resolution;
 	public float time;
+	public float timeToTarget;
 	public float speed = 10f;
 	public float g = -18f;
 	public Color[] colorIndicators;
+	public float multiplier = 1.15f;
 	private Material arcMat;
 	private Vector3 velocity;
 
@@ -58,11 +61,11 @@ public class ArcRenderer : MonoBehaviour {
 		// disable aimer object and arc when tilting above 45 degrees and below -90 degrees (max and min teleport distances)
 		if(controller.eulerAngles.x < 300 && controller.eulerAngles.x > 90){
 			arcMat.color = colorIndicators[1];
-			time = 0.01f;
+			timeToTarget = 0.01f;
 			aimerObject.SetActive(false);
 		} else {
 			arcMat.color = colorIndicators[0];
-			time = 2f;
+			timeToTarget = time;
 		}
 
 		// set velocity to shoot forward from controller
@@ -111,6 +114,20 @@ public class ArcRenderer : MonoBehaviour {
 			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
 			Vector3 drawPoint = controller.position + displacement;
 
+			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
+			previousDrawPoint = drawPoint;
+			if(transform.InverseTransformPoint(drawPoint).y <= detecter.transform.position.y && transform.InverseTransformPoint(drawPoint).y > detecter.transform.position.y -1f){
+				timeToTarget = ( i / (float)resolution * time ) * multiplier;
+				// break;
+			}
+		}
+
+		previousDrawPoint = controller.position;
+		for(int i = 1; i <= resolution; i++){
+			float simulationTime = i / (float)resolution * timeToTarget;
+			Vector3 displacement = velocity * simulationTime + Vector3.up * g * simulationTime * simulationTime / 2f;
+			Vector3 drawPoint = controller.position + displacement;
+
 			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points is annoying
 			previousDrawPoint = drawPoint;
 		}
@@ -118,12 +135,13 @@ public class ArcRenderer : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision other){
+		aimerObject.SetActive(true);
+
 		if(other.gameObject.tag == "platform"){
-			aimerObject.SetActive(true);
-			aimerObject.transform.position = other.transform.position;;
+			Vector3 platform = other.transform.position;
+			aimerObject.transform.position = new Vector3(platform.x, 0.44f, platform.z);
 		}
 		if(other.gameObject.tag == "teleport"){
-			aimerObject.SetActive(true);
 			Vector3 contact = other.contacts[0].point;
 			Vector3 startPos = aimerObject.transform.position;
 			Vector3 endPos = new Vector3(contact.x,0.02f,contact.z);
