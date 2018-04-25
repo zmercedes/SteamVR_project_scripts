@@ -16,7 +16,6 @@ public class ArcRenderer : MonoBehaviour {
 
 	// teleport aimer object
 	public GameObject aimerObject;
-	public GameObject detecter;
 
 	// arc information
 	public float meshWidth;
@@ -116,7 +115,7 @@ public class ArcRenderer : MonoBehaviour {
 
 			Debug.DrawLine (previousDrawPoint, drawPoint, Color.green);
 			previousDrawPoint = drawPoint;
-			if(transform.InverseTransformPoint(drawPoint).y <= detecter.transform.position.y && transform.InverseTransformPoint(drawPoint).y > detecter.transform.position.y -1f){
+			if(transform.InverseTransformPoint(drawPoint).y <= aimerObject.transform.position.y){
 				timeToTarget = ( i / (float)resolution * time ) * multiplier;
 				// break;
 			}
@@ -130,6 +129,13 @@ public class ArcRenderer : MonoBehaviour {
 
 			arcArray[i] = transform.InverseTransformPoint(previousDrawPoint); // issue with calculation: local -> world points is annoying
 			previousDrawPoint = drawPoint;
+			if(i == resolution){
+				int mask = 1 << 8;
+				RaycastHit hit;
+				if(Physics.Raycast(drawPoint, Vector3.down, out hit, 10f, mask))
+					aimerObject.transform.position = hit.transform.position;
+			}
+
 		}
 		return arcArray;
 	}
